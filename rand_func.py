@@ -1,7 +1,7 @@
 import math
 import random
 
-
+# finding square root of a number
 def find_square_root(guess, x):
 	while (round(guess * guess, 2) != x):
 		guess = (guess + (x / guess)) / 2
