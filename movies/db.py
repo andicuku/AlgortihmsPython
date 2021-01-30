@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Date, TIMESTAMP, ForeignKey
+from sqlalchemy import Table, Column, Integer, String, Date, TIMESTAMP, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -10,6 +10,13 @@ from .config import DB_URI
 engine = create_engine(DB_URI, echo=True)
 Base = declarative_base(bind=engine)
 Session = sessionmaker(bind=engine)
+
+actors = Table(
+    "actors",
+    Base.metadata,
+    Column("person_id", Integer, ForeignKey("people.id"), nullable=False),
+    Column("movie_id", Integer, ForeignKey("movies.id"), nullable=False),
+)
 
 
 class Person(Base):
@@ -30,6 +37,7 @@ class Person(Base):
     produced_movies = relationship(
         "Movie", foreign_keys="Movie.producer_id", back_populates="producer"
     )
+    movies = relationship("Movie", secondary=actors, back_populates="actors")
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -60,6 +68,7 @@ class Movie(Base):
     producer = relationship(
         Person, foreign_keys=[producer_id], back_populates="produced_movies"
     )
+    actors = relationship("Person", secondary=actors, back_populates="movies")
 
     def __str__(self):
         return f"{self.id}. {self.title}"
