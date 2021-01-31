@@ -1,4 +1,4 @@
-from .db import Base, Session, engine, Person, Movie, Category
+from .db import Session, Person, Movie, Category, User
 
 
 def populate_db():
@@ -124,5 +124,18 @@ def populate_db():
     ]
 
     session.add_all(movies)
+
+    users = [
+        User(username="gledi"),
+        User(username="juli"),
+        User(username="kevin"),
+        User(username="andi"),
+        User(username="johana"),
+        User(username="arjola"),
+        User(username="lutmira"),
+        User(username="izaura")
+    ]
+
+    session.add_all(users)
 
     session.commit()

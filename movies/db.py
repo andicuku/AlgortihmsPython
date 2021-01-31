@@ -101,9 +101,46 @@ class Movie(Base):
     )
     category = relationship(Category, back_populates="movies")
     actors = relationship("Person", secondary=actors, back_populates="movies")
+    reviews = relationship("Review", back_populates="movie")
 
     def __str__(self):
         return f"{self.id}. {self.title}"
 
     def __repr__(self):
         return f"Movie(id={self.id}, title={self.title!r})"
+
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    username = Column(String(50), nullable=False, unique=True)
+
+    reviews = relationship("Review", back_populates="user")
+
+    def __str__(self):
+        return self.username
+
+    def __repr__(self):
+        return f'User(id={self.id}, username={self.username!r})'
+
+
+class Review(Base):
+    __tablename__ = 'reviews'
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+    movie_id = Column(Integer, ForeignKey(Movie.id), nullable=False)
+    rating = Column(
+        Numeric(2, 1),
+        CheckConstraint("rating >= 1 AND rating <= 10", name="chk_movies_rating"),
+        nullable=True,
+    )
+    review = Column(String(500), nullable=False)
+    created_at = Column(TIMESTAMP, default=datetime.datetime.utcnow)
+    updated_at = Column(
+        TIMESTAMP, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
+    )
+
+    user = relationship(User, back_populates='reviews')
+    movie = relationship(Movie, back_populates="reviews")
