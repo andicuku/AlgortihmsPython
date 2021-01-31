@@ -133,7 +133,7 @@ class Review(Base):
     movie_id = Column(Integer, ForeignKey(Movie.id), nullable=False)
     rating = Column(
         Numeric(2, 1),
-        CheckConstraint("rating >= 1 AND rating <= 10", name="chk_movies_rating"),
+        CheckConstraint("rating >= 1 AND rating <= 10", name="chk_reviews_rating"),
         nullable=True,
     )
     review = Column(String(500), nullable=False)
