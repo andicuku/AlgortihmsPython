@@ -1,4 +1,5 @@
-from .db import Session, Person, Movie, Category, User
+from .db import Session
+from .models import Person, Movie, Category, User
 
 
 def populate_db():
