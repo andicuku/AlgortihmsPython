@@ -1,32 +1,39 @@
-from typing import List
+import secrets
+from time import perf_counter
 
-from sqlalchemy.orm import Session
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import FastAPI, Request
 
-from . import schemas, models
-from .dependencies import get_db
+from .api.categories import router as category_router
 from .api.users import router as user_router
 from .api.movies import router as movies_router
-
+from .logs import get_logger
 
 app = FastAPI()
 
+log = get_logger(__name__)
+
+
+@app.middleware("http")
+async def log_request_info(request: Request, next):
+    req_id = secrets.token_hex(5)
+
+    log.info("REQ-ID=%s :: Path = %r", req_id, request.url.path)
+
+    start_time = perf_counter()
+    response = await next(request)
+    end_time = perf_counter()
+
+    elapsed_time = "{0:.4f}".format((end_time - start_time))
+    log.info("REQ-ID=%s :: Elapsed Time = %s", req_id, elapsed_time)
+
+    return response
+
+
+@app.get("/")
+def index():
+    return {"message": "Movies API"}
+
+
+app.include_router(category_router, prefix="/categories")
 app.include_router(user_router, prefix="/users")
 app.include_router(movies_router, prefix="/movies")
-
-
-@app.get("/categories", response_model=List[schemas.Category])
-def get_categories_list(db: Session = Depends(get_db)):
-    """
-    Gets the categories list
-    """
-    categories = db.query(models.Category).all()
-    return categories
-
-
-@app.get("/categories/{category_id}", response_model=schemas.Category)
-def get_category_details(category_id: int, db: Session = Depends(get_db)):
-    category = db.query(models.Category).get(category_id)
-    if category is None:
-        raise HTTPException(404, "Category not found.")
-    return category

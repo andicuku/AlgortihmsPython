@@ -9,7 +9,7 @@ from movies.dependencies import get_db
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.Movie])
+@router.get("", response_model=List[schemas.Movie])
 def get_movies_list(db: Session = Depends(get_db)):
     movies = (
         db.query(models.Movie)

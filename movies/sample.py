@@ -1,9 +1,18 @@
+from sqlalchemy import func
+
 from .db import SessionLocal
-from .models import Person, Movie, Category, User
+from .models import Base, Person, Movie, Category, User
 
 
 def populate_db():
+    Base.metadata.create_all()
+
     session = SessionLocal()
+
+    existing_category_count = session.query(func.count(Category.id)).scalar()
+
+    if existing_category_count > 0:
+        return
 
     comedy = Category(name="Comedy")
     adventure = Category(name="Adventure")
