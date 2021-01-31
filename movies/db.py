@@ -10,7 +10,7 @@ is_dev = APP_ENV == "development"
 
 engine = create_engine(DB_URI, echo=is_dev)
 Base = declarative_base(bind=engine)
-Session = sessionmaker(
+SessionLocal = sessionmaker(
     bind=engine,
     autocommit=False,
     autoflush=False,

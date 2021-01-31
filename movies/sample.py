@@ -1,9 +1,9 @@
-from .db import Session
+from .db import SessionLocal
 from .models import Person, Movie, Category, User
 
 
 def populate_db():
-    session = Session()
+    session = SessionLocal()
 
     comedy = Category(name="Comedy")
     adventure = Category(name="Adventure")

@@ -1,11 +1,31 @@
-import sys
+from typing import List
+
+from sqlalchemy.orm import Session
+from fastapi import Depends, FastAPI, HTTPException
+
+from . import schemas, models
+from .db import SessionLocal
+
+app = FastAPI()
 
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv[1:]
-    print("Executing movies module ...")
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
-if __name__ == "__main__":
-    sys.exit(main())
+@app.get("/categories", response_model=List[schemas.Category])
+def get_categories_list(db: Session = Depends(get_db)):
+    categories = db.query(models.Category).all()
+    return categories
+
+
+@app.get("/categories/{category_id}", response_model=schemas.Category)
+def get_category_details(category_id: int, db: Session = Depends(get_db)):
+    category = db.query(models.Category).get(category_id)
+    if category is None:
+        raise HTTPException(404, "Category not found.")
+    return category
