@@ -8,6 +8,7 @@ from .api.users import router as user_router
 from .api.movies import router as movies_router
 from .logs import get_logger
 
+
 app = FastAPI()
 
 log = get_logger(__name__)

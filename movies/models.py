@@ -7,6 +7,7 @@ from sqlalchemy import (
     String,
     Numeric,
     Date,
+    Boolean,
     TIMESTAMP,
     ForeignKey,
     CheckConstraint,
