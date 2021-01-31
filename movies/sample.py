@@ -133,7 +133,7 @@ def populate_db():
         User(username="johana"),
         User(username="arjola"),
         User(username="lutmira"),
-        User(username="izaura")
+        User(username="izaura"),
     ]
 
     session.add_all(users)

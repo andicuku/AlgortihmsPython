@@ -122,11 +122,11 @@ class User(Base):
         return self.username
 
     def __repr__(self):
-        return f'User(id={self.id}, username={self.username!r})'
+        return f"User(id={self.id}, username={self.username!r})"
 
 
 class Review(Base):
-    __tablename__ = 'reviews'
+    __tablename__ = "reviews"
 
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     user_id = Column(Integer, ForeignKey(User.id), nullable=False)
@@ -142,5 +142,5 @@ class Review(Base):
         TIMESTAMP, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
     )
 
-    user = relationship(User, back_populates='reviews')
+    user = relationship(User, back_populates="reviews")
     movie = relationship(Movie, back_populates="reviews")
