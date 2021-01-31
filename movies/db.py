@@ -1,8 +1,18 @@
 import datetime
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, Integer, String, Date, TIMESTAMP, ForeignKey
+from sqlalchemy import (
+    Table,
+    Column,
+    Integer,
+    String,
+    Numeric,
+    Date,
+    TIMESTAMP,
+    ForeignKey,
+)
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql.schema import CheckConstraint
 
 from .config import DB_URI
 
@@ -17,6 +27,21 @@ actors = Table(
     Column("person_id", Integer, ForeignKey("people.id"), nullable=False),
     Column("movie_id", Integer, ForeignKey("movies.id"), nullable=False),
 )
+
+
+class Category(Base):
+    __tablename__ = "categories"
+
+    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
+
+    movies = relationship("Movie", back_populates="category")
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"Category(id={self.id}, name={self.name!r})"
 
 
 class Person(Base):
@@ -57,6 +82,12 @@ class Movie(Base):
     bo_returns = Column(Integer, nullable=True)
     director_id = Column(Integer, ForeignKey(Person.id), nullable=False)
     producer_id = Column(Integer, ForeignKey(Person.id), nullable=False)
+    category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
+    rating = Column(
+        Numeric(2, 1),
+        CheckConstraint("rating >= 1 AND rating <= 10", name="chk_movies_rating"),
+        nullable=True,
+    )
     created_at = Column(TIMESTAMP, default=datetime.datetime.utcnow)
     updated_at = Column(
         TIMESTAMP, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow
@@ -68,6 +99,7 @@ class Movie(Base):
     producer = relationship(
         Person, foreign_keys=[producer_id], back_populates="produced_movies"
     )
+    category = relationship(Category, back_populates="movies")
     actors = relationship("Person", secondary=actors, back_populates="movies")
 
     def __str__(self):
